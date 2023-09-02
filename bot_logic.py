@@ -16,6 +16,3 @@ def coin_flip():
     elif side == 2:
         return "Tails"
     
-def help():
-    commands = "Flip a coin, Generate a password, Help, deleteme"
-    return "Commands: "+commands

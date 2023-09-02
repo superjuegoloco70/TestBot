@@ -1,33 +1,40 @@
-import discord
+import discord, os, random, requests
+from discord.ext import commands
 from bot_logic import *
 
-# La variable intents almacena los privilegios del bot
 intents = discord.Intents.default()
-# Activar el privilegio de lectura de mensajes
 intents.message_content = True
-# Crear un bot en la variable cliente y transferirle los privilegios
-client = discord.Client(intents=intents)
 
-@client.event
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+@bot.event
 async def on_ready():
-    print(f'Hemos iniciado sesión como {client.user}')
+    print(f'Ha iniciado sesión como {bot.user}')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    if message.content.startswith('$hello'):
-        await message.channel.send("Hi!")
-    elif message.content.startswith('$bye'):
-        await message.channel.send("\\U0001f642")
-    elif message.content.startswith("$Flip a coin"):
-        await message.channel.send(coin_flip())
-    elif message.content.startswith("$Generate a password"):
-        await message.channel.send(gen_pass(10))    
-    elif message.content.startswith("$Help"):
-        await message.channel.send(help())
-    elif message.content.startswith('$deleteme'):
-            msg = await message.channel.send('I will delete myself now...')
-            await msg.delete()  
-    
-client.run("")
+@bot.command()
+async def meme(ctx):
+    img_name = random.choice(os.listdir("Kodland\Proyecto 2\imgs"))
+    with open(f"Kodland\Proyecto 2\imgs/{img_name}", "rb") as f:
+        picture = discord.File(f)
+    await ctx.send (file = picture)
+
+def get_duck_image_url():
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+@bot.command('duck')
+async def duck(ctx):
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
+
+@bot.command()
+async def password(ctx):
+    await ctx.send(gen_pass(10))
+
+@bot.command()
+async def coin(ctx):
+    await ctx.send(coin_flip)
+
+bot.run("")
